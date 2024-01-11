@@ -11,7 +11,7 @@
     <modules>
         <module>register_service</module>
         <module>notification_service</module>
-        <module>circuit-breaker_platform</module>
+        <module>circuit_breaker_platform</module>
     </modules>
 
     <properties>

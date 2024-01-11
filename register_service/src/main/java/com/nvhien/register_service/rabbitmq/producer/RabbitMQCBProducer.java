@@ -1,4 +1,4 @@
-package com.nvhien.register_service.rabbitmq;
+package com.nvhien.register_service.rabbitmq.producer;
 
 import com.nvhien.register_service.util.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class RabbitMQProducer {
+public class RabbitMQCBProducer {
+    private final RabbitTemplate rabbitTemplate;
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
 
-    @Value("${rabbitmq.routing.key}")
+    @Value("${rabbitmq.circuit-breaker.routing.key}")
     private String routingKey;
 
-    private final RabbitTemplate rabbitTemplate;
-
-    public RabbitMQProducer(RabbitTemplate rabbitTemplate) {
+    public RabbitMQCBProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -30,6 +29,5 @@ public class RabbitMQProducer {
         } catch (AmqpException amqpException) {
             return Result.SEND_MSG_TO_RABBIT_FAILED;
         }
-
     }
 }

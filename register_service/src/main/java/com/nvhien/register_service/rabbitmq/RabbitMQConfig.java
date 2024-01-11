@@ -10,18 +10,29 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-    @Value("${rabbitmq.queue.name}")
-    private String queue;
+    @Value("${rabbitmq.register.queue.name}")
+    private String registerQueue;
+
+    @Value("${rabbitmq.circuit-breaker.queue.name}")
+    private String circuitBreakerQueue;
 
     @Value("${rabbitmq.exchange.name}")
     private String exchange;
 
-    @Value("${rabbitmq.routing.key}")
-    private String routingKey;
+    @Value("${rabbitmq.register.routing.key}")
+    private String registerRoutingKey;
+
+    @Value("${rabbitmq.circuit-breaker.routing.key}")
+    private String circuitBreakerRoutingKey;
 
     @Bean
-    public Queue queue(){
-        return new Queue(queue);
+    public Queue registerQueue(){
+        return new Queue(registerQueue);
+    }
+
+    @Bean
+    public Queue circuitBreakerQueue(){
+        return new Queue(circuitBreakerQueue);
     }
 
     @Bean
@@ -30,10 +41,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding binding(){
+    public Binding registerBinding(){
         return BindingBuilder
-                .bind(queue())
+                .bind(registerQueue())
                 .to(exchange())
-                .with(routingKey);
+                .with(registerRoutingKey);
+    }
+
+    @Bean
+    public Binding circuitBreakerBinding(){
+        return BindingBuilder
+                .bind(circuitBreakerQueue())
+                .to(exchange())
+                .with(circuitBreakerRoutingKey);
     }
 }

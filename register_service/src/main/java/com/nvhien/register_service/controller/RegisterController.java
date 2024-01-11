@@ -2,7 +2,8 @@ package com.nvhien.register_service.controller;
 
 import com.nvhien.register_service.model.dto.UserRabbitMQMessage;
 import com.nvhien.register_service.model.dto.UserRequest;
-import com.nvhien.register_service.rabbitmq.RabbitMQProducer;
+import com.nvhien.register_service.rabbitmq.producer.RabbitMQCBProducer;
+import com.nvhien.register_service.rabbitmq.producer.RabbitMQRegisterProducer;
 import com.nvhien.register_service.service.UserService;
 import com.nvhien.register_service.util.JsonUtil;
 import com.nvhien.register_service.util.Result;
@@ -21,35 +22,47 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class RegisterController {
     private final UserService userService;
-    private final RabbitMQProducer rabbitMQProducer;
+    private final RabbitMQRegisterProducer rabbitMQRegisterProducer;
+    private final RabbitMQCBProducer rabbitMQCBProducer;
 
-    public RegisterController(UserService userService, RabbitMQProducer rabbitMQProducer) {
+    public RegisterController(UserService userService, RabbitMQRegisterProducer rabbitMQRegisterProducer, RabbitMQCBProducer rabbitMQCBProducer) {
         this.userService = userService;
-        this.rabbitMQProducer = rabbitMQProducer;
+        this.rabbitMQRegisterProducer = rabbitMQRegisterProducer;
+        this.rabbitMQCBProducer = rabbitMQCBProducer;
     }
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
         Result createResult = userService.create(userRequest);
+
+        try (ExecutorService sendRabbitExc = Executors.newSingleThreadExecutor()) {
+            sendRabbitExc.execute(() -> sendResultCodeToKafka(createResult.getCode()));
+        }
+
         if (createResult != Result.SUCCESS) {
             log.error(createResult.getDescription());
             return ResponseEntity.badRequest().body(createResult.getDescription());
         }
 
         try (ExecutorService sendRabbitExc = Executors.newSingleThreadExecutor()) {
-            sendRabbitExc.execute(() -> sendMsgToKafka(userRequest));
+            sendRabbitExc.execute(() -> sendRegisterMsgToKafka(userRequest));
         }
 
         log.info("Save user to DB successfully.");
         return ResponseEntity.ok("User created.");
     }
 
-    public void sendMsgToKafka(UserRequest userRequest) {
+    public void sendRegisterMsgToKafka(UserRequest userRequest) {
         UserRabbitMQMessage userRabbitMQMessage = UserRabbitMQMessage.builder()
                 .mailAddress(userRequest.getEmail())
                 .fullName(userRequest.getFullName())
                 .build();
-        Result sendRabbitResult = rabbitMQProducer.sendMessage(JsonUtil.objectToString(userRabbitMQMessage));
+        Result sendRabbitResult = rabbitMQRegisterProducer.sendMessage(JsonUtil.objectToString(userRabbitMQMessage));
+        log.info(sendRabbitResult.getDescription());
+    }
+
+    public void sendResultCodeToKafka(int resultCode) {
+        Result sendRabbitResult = rabbitMQCBProducer.sendMessage(Integer.toString(resultCode));
         log.info(sendRabbitResult.getDescription());
     }
 }
