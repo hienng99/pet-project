@@ -40,7 +40,7 @@ public class RegisterController {
         }
 
         if (createResult != Result.SUCCESS) {
-            log.error(createResult.getDescription());
+            log.warn(createResult.getDescription());
             return ResponseEntity.badRequest().body(createResult.getDescription());
         }
 
