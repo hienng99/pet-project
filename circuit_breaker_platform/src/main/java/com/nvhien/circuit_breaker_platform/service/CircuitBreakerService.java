@@ -1,6 +1,7 @@
 package com.nvhien.circuit_breaker_platform.service;
 
 import com.nvhien.circuit_breaker_platform.client.CallMaintainRegisterTask;
+import com.nvhien.circuit_breaker_platform.maintenance.MaintainServiceTask;
 import com.nvhien.circuit_breaker_platform.utils.CBUtils;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class CircuitBreakerService {
-    private final CallMaintainRegisterTask callMaintainRegisterTask;
+    private final MaintainServiceTask maintainServiceTask;
 
-    public CircuitBreakerService(CallMaintainRegisterTask callMaintainRegisterTask) {
-        this.callMaintainRegisterTask = callMaintainRegisterTask;
+    public CircuitBreakerService(MaintainServiceTask maintainServiceTask) {
+        this.maintainServiceTask = maintainServiceTask;
     }
 
     public void handleResultCode(int resultCode) {
@@ -30,7 +31,7 @@ public class CircuitBreakerService {
         log.warn("CB status: {}", circuitBreaker.getState().name());
         if (CircuitBreaker.State.OPEN == circuitBreaker.getState()) {
             log.warn("Call maintain.");
-            callMaintainRegisterTask.execute();
+            maintainServiceTask.execute();
         }
     }
 }

@@ -11,8 +11,8 @@
 	<groupId>com.nvhien</groupId>
 	<artifactId>product_info</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product_info_service</name>
-	<description>Demo project for Spring Boot</description>
+	<name>product_info</name>
+	<description>product_info</description>
 	<properties>
 		<java.version>21</java.version>
 	</properties>

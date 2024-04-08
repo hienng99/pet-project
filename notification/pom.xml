@@ -11,8 +11,8 @@
     <groupId>com.nvhien</groupId>
     <artifactId>notification</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>notification_service</name>
-    <description>notification_service</description>
+    <name>notification</name>
+    <description>notification</description>
     <properties>
         <java.version>21</java.version>
     </properties>

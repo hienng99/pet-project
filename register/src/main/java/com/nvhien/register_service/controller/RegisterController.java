@@ -6,6 +6,7 @@ import com.nvhien.register_service.rabbitmq.producer.RabbitMQCBProducer;
 import com.nvhien.register_service.rabbitmq.producer.RabbitMQRegisterProducer;
 import com.nvhien.register_service.service.UserService;
 import com.nvhien.register_service.util.JsonUtil;
+import com.nvhien.register_service.util.RegisterConst;
 import com.nvhien.register_service.util.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +36,14 @@ public class RegisterController {
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
+        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+            try (Jedis jedis = pool.getResource()) {
+                String serviceStatus = jedis.get(RegisterConst.SERVICE_NAME);
+                if (!"1".equals(serviceStatus)) {
+                    return ResponseEntity.ok("Service is under maintenance.");
+                }
+            }
+        }
         Result createResult = userService.create(userRequest);
 
         try (ExecutorService sendRabbitExc = Executors.newSingleThreadExecutor()) {
