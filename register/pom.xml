@@ -64,6 +64,13 @@
             <artifactId>jedis</artifactId>
             <version>5.1.2</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.getunleash/unleash-client-java -->
+        <dependency>
+            <groupId>io.getunleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+            <version>9.2.0</version>
+        </dependency>
+
 
     </dependencies>
 

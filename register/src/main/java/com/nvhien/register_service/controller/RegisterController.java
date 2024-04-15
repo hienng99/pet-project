@@ -8,7 +8,12 @@ import com.nvhien.register_service.service.UserService;
 import com.nvhien.register_service.util.JsonUtil;
 import com.nvhien.register_service.util.RegisterConst;
 import com.nvhien.register_service.util.Result;
+import io.getunleash.DefaultUnleash;
+import io.getunleash.Unleash;
+import io.getunleash.util.UnleashConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +41,21 @@ public class RegisterController {
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
+        UnleashConfig unleashConfig = UnleashConfig.builder()
+                .appName("default")
+                .instanceId("localhost")
+                .unleashAPI("http://localhost:4242/api/")
+                .apiKey("default:development.unleash-insecure-api-token")
+                .synchronousFetchOnInitialisation(true)
+                .build();
+
+        Unleash unleash = new DefaultUnleash(unleashConfig);
+
+        if (!unleash.isEnabled("register_service_toogle")) {
+            log.warn("Unleash off.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found.");
+        }
+
         try (JedisPool pool = new JedisPool("localhost", 6379)) {
             try (Jedis jedis = pool.getResource()) {
                 String serviceStatus = jedis.get(RegisterConst.SERVICE_NAME);
