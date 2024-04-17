@@ -38,12 +38,12 @@ public class RegisterController {
 
     @PostMapping
     public ResponseEntity<String> register(@RequestBody UserRequest userRequest) {
-        if (!UnleashUtils.getUnleash().isEnabled("register_service_toogle")) {
+        if (!UnleashUtils.getUnleash().isEnabled("register_service_toggle")) {
             log.warn("Unleash off.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found.");
         }
 
-        try (JedisPool pool = new JedisPool("127.0.0.1", 6379)) {
+        try (JedisPool pool = new JedisPool("172.23.224.165", 6379)) {
             try (Jedis jedis = pool.getResource()) {
                 String serviceStatus = jedis.get(RegisterConst.SERVICE_NAME);
                 if (!"1".equals(serviceStatus)) {

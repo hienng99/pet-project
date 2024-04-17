@@ -15,7 +15,7 @@ import redis.clients.jedis.JedisPool;
 public class RegisterServiceStatusTask implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
-        try (JedisPool pool = new JedisPool("localhost", 6379)) {
+        try (JedisPool pool = new JedisPool("172.23.224.165", 6379)) {
             try (Jedis jedis = pool.getResource()) {
                 jedis.set(RegisterConst.SERVICE_NAME, Integer.toString(1));
                 log.warn("Set service status to 1.");

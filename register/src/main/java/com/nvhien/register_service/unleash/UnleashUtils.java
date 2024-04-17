@@ -14,8 +14,8 @@ public class UnleashUtils {
         if (unleash == null) {
             UnleashConfig unleashConfig = UnleashConfig.builder()
                     .appName("default")
-                    .instanceId("localhost")
-                    .unleashAPI("http://localhost:4242/api/")
+                    .instanceId("172.23.224.165")
+                    .unleashAPI("http://172.23.224.165:4242/api/")
                     .apiKey("default:development.unleash-insecure-api-token")
                     .synchronousFetchOnInitialisation(true)
                     .build();
