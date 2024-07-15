@@ -43,9 +43,9 @@ public class RegisterController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found.");
         }
 
-        try (JedisPool pool = new JedisPool("172.23.224.165", 6379)) {
+        try (JedisPool pool = new JedisPool("localhost", 6379)) {
             try (Jedis jedis = pool.getResource()) {
-                String serviceStatus = jedis.get(RegisterConst.SERVICE_NAME);
+                String serviceStatus = jedis.get(RegisterConst.REGISTER_SERVICE_STATUS);
                 if (!"1".equals(serviceStatus)) {
                     return ResponseEntity.ok("Service is under maintenance.");
                 }

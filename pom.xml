@@ -12,7 +12,7 @@
         <module>register</module>
         <module>notification</module>
         <module>circuit_breaker_platform</module>
-        <module>product_info</module>
+        <module>gateway</module>
     </modules>
 
     <properties>
